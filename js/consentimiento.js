@@ -23,8 +23,9 @@
 
     var CLAVE = 'crea-consentimiento-analitica';
     // Subir si cambian las finalidades o cómo se explican: obliga a volver a
-    // preguntar. La 2 nombra la hoja de contactos, que la 1 callaba.
-    var VERSION = 2;
+    // preguntar. La 2 nombra la hoja de contactos, que la 1 callaba. La 3
+    // acompaña la política v4: GA4 recibe el tema (dolencia) del botón tocado.
+    var VERSION = 3;
 
     // Las páginas de /dolencias/, /zonas/ y /blog/ están un nivel más abajo.
     function rutaRaiz() {

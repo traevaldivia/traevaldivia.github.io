@@ -52,7 +52,9 @@
         if (!(window.Consentimiento && window.Consentimiento.concedido())) return;
 
         var cuerpo = JSON.stringify({
-            pagina: window.creaPagina ? window.creaPagina() : location.pathname,
+            // El mismo valor que el «pagina» de GA4 (conversion-tracking.js):
+            // lo define main.js. Si main.js no cargó, los dos van vacíos.
+            pagina: window.creaPagina ? window.creaPagina() : '',
             dispositivo: dispositivo(),
             canal: datos.canal || 'whatsapp',
             origen: datos.origen || '',

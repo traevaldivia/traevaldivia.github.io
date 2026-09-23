@@ -12,6 +12,11 @@
      guardada. Puede aparecer en cualquier URL, así que todas las rutas son
      absolutas, y todo lo que carga está en el precache de sw.js. -->
 <link rel="icon" href="/favicon-32x32.png" sizes="32x32">
+<!-- Las dos fuentes precargadas (están en el precache de sw.js): sin esto el
+     título y el texto cambian de fuente después del primer pintado y la
+     página salta. -->
+<link rel="preload" href="/fonts/figtree-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/youngserif.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
 <link rel="stylesheet" href="/css/paginas/contenido.css">
 <!-- Sin defer a propósito: fija data-theme antes del primer pintado. -->
@@ -23,7 +28,7 @@
   <section class="seccion">
     <div class="contenedor">
       <div class="error-pagina">
-        <img src="/img/logo-crea.webp" width="160" height="105" alt="Plantillas Ortopédicas Crea">
+        <img src="/img/sm/logo-crea.webp" width="160" height="105" alt="Plantillas Ortopédicas Crea">
         <h1>Estás sin conexión</h1>
         <div class="prosa">
           <p>Esta página no quedó guardada en tu teléfono y ahora mismo no hay señal para traerla.

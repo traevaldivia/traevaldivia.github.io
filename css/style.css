@@ -696,7 +696,8 @@
         line-height: 1.5;
     }
 
-    .consentimiento__texto p { max-inline-size: 70ch; }
+    /* 58ch de «0» son ~75 caracteres reales de texto: bajo el tope de 80. */
+    .consentimiento__texto p { max-inline-size: 58ch; }
 
     .consentimiento__texto p + p {
         margin-block-start: var(--e-1);
@@ -723,7 +724,9 @@
     @media (width < 52rem) {
         .consentimiento {
             gap: var(--e-3);
-            padding: var(--e-3) min(1rem, 4vw) calc(var(--e-3) + env(safe-area-inset-bottom, 0px));
+            /* Margen lateral de 16 px, como el resto de la pagina: con 4vw el
+               texto quedaba a 14 px del borde en 360 px. */
+            padding: var(--e-3) 1rem calc(var(--e-3) + env(safe-area-inset-bottom, 0px));
         }
 
         .consentimiento__botones { flex: 1 1 100%; }
@@ -1423,6 +1426,8 @@
         font-size: var(--t-sm);
         color: var(--tinta-2);
     }
+
+    .pie__legal p { max-inline-size: 58ch; }
 
     @media (min-width: 44rem) {
         .pie__legal {

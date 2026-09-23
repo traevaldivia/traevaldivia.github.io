@@ -5,18 +5,17 @@
 //
 // Los enlaces declaran su contexto en el HTML:
 //   data-wa-origen="hero"   de donde salio el contacto
-//   data-wa-servicio="..."  que servicio o dolencia lo origino. A GA4 solo
-//                           llega si es un servicio (evaluacion, receta,
-//                           plantillas-a-medida); una dolencia es un dato de
-//                           salud y quedaria ligada a la cookie _ga, asi que
-//                           se manda como plantillas-a-medida y se quita
-//                           tambien del origen («portada-pie-plano» ->
-//                           «portada»). La hoja de contactos si la anota, y
-//                           solo con consentimiento.
+//   data-wa-servicio="..."  que servicio o dolencia lo origino. Va a GA4 tal
+//                           cual, dolencia incluida: es el tema de la pagina,
+//                           que ya viaja en page_location y en «pagina». Es
+//                           contenido publico, no algo que la persona conto.
+//                           Lo que si es suyo, el motivo que elige en el
+//                           formulario, nunca va a GA4 (formulario-whatsapp.js).
 //   data-no-medir           no medir este enlace (el respaldo del formulario:
 //                           ese contacto ya se midió al enviar)
 //
-// Un doble clic en el mismo enlace cuenta una vez y abre una sola pestaña.
+// Un doble clic en el mismo enlace se mide una vez. La navegacion nunca se
+// bloquea: si la persona vuelve a tocar, WhatsApp o el telefono se abren igual.
 //
 // Nada de datos personales en los parametros.
 (function () {
@@ -38,32 +37,19 @@
         medir(nombre, parametros);
     }
 
+    // Mismo valor que recibe la hoja (whatsapp-tracking.js): lo define main.js.
     function pagina() {
-        return window.creaPagina ? window.creaPagina() : location.pathname;
+        return window.creaPagina ? window.creaPagina() : '';
     }
 
-    // true si es el mismo enlace tocado hace menos de 1,5 s (doble clic o
-    // dedo nervioso): no se mide ni se abre otra vez.
+    // true si es el mismo enlace tocado hace menos de 1,5 s desde el ultimo
+    // toque medido (doble clic o dedo nervioso). Solo evita medir dos veces;
+    // los toques repetidos no reinician la ventana.
     function esRepeticion(href) {
         var ahora = Date.now();
-        var repetido = href === ultimoClic.href && ahora - ultimoClic.momento < VENTANA_REPETICION_MS;
+        if (href === ultimoClic.href && ahora - ultimoClic.momento < VENTANA_REPETICION_MS) return true;
         ultimoClic = { href: href, momento: ahora };
-        return repetido;
-    }
-
-    var SERVICIOS = ['evaluacion', 'receta', 'plantillas-a-medida'];
-
-    function esDolencia(servicio) {
-        return !!servicio && SERVICIOS.indexOf(servicio) === -1;
-    }
-
-    // Lo que GA4 puede saber del origen: el servicio, nunca la dolencia.
-    function paraGA(ctx) {
-        if (!esDolencia(ctx.servicio)) return ctx;
-        return {
-            ubicacion: ctx.ubicacion.replace('-' + ctx.servicio, ''),
-            servicio: 'plantillas-a-medida'
-        };
+        return false;
     }
 
     function contexto(el) {
@@ -81,17 +67,13 @@
         var esWhatsApp = href.indexOf('wa.me') !== -1 || href.indexOf('api.whatsapp.com') !== -1;
         var esTelefono = href.indexOf('tel:') === 0;
 
-        if ((esWhatsApp || esTelefono) && esRepeticion(href)) {
-            e.preventDefault();
-            return;
-        }
         if (enlace.hasAttribute('data-no-medir')) return;
+        if ((esWhatsApp || esTelefono) && esRepeticion(href)) return;
         var ctx = contexto(enlace);
 
         if (esWhatsApp) {
-            var ga = paraGA(ctx);
             medir('whatsapp_click', {
-                ubicacion: ga.ubicacion, servicio: ga.servicio, pagina: pagina()
+                ubicacion: ctx.ubicacion, servicio: ctx.servicio, pagina: pagina()
             });
             if (window.CreaLeads) {
                 window.CreaLeads.registrar({ origen: ctx.ubicacion, motivo: ctx.servicio });

@@ -12,11 +12,12 @@
     };
 
     // La página actual con un solo formato para GA4 y para la hoja de
-    // contactos: sin barra inicial y con index.html explícito
-    // ('/' -> 'index.html', '/blog/' -> 'blog/index.html').
+    // contactos: sin barra inicial, con index.html explícito, en minúsculas y
+    // recortada ('/' -> 'index.html', '/blog/' -> 'blog/index.html',
+    // '/No-Existe' -> 'no-existe'). google-apps-script.gs normaliza igual.
     window.creaPagina = function () {
-        var ruta = location.pathname.replace(/\/$/, '/index.html').replace(/^\//, '');
-        return ruta || 'index.html';
+        var ruta = location.pathname.replace(/\/$/, '/index.html').replace(/^\/+/, '');
+        return (ruta || 'index.html').toLowerCase().slice(0, 120);
     };
 
     function menuMovil() {
