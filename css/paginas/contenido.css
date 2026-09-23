@@ -1,0 +1,162 @@
+/* Páginas de contenido: sobre, preguntas, contacto, zonas, política, errores.
+   Lo común vive en style.css; aquí solo lo propio de estas páginas. */
+
+@layer componentes {
+
+    /* --- Portada de texto (sin foto) --- */
+
+    /* El ancho maximo va en los hijos y no en el bloque: .portada-texto es
+       tambien un .contenedor, y limitarlo a 42rem lo centraba y dejaba el H1
+       unos 200 px a la derecha de las migas en escritorio. */
+    .portada-texto {
+        padding-block: var(--e-5) var(--e-7);
+    }
+
+    .portada-texto > * { max-inline-size: 42rem; }
+
+    .portada-texto h1 { font-size: var(--t-3xl); }
+
+    .portada-texto p {
+        font-size: var(--t-lg);
+        color: var(--tinta-2);
+        margin-block-start: var(--e-5);
+    }
+
+    /* --- Perfil de Monserrat --- */
+
+    .biografia {
+        display: grid;
+        gap: var(--e-7);
+        align-items: start;
+        /* Mismo motivo que .portada: el resplandor de la foto se sale a
+           proposito y hay que recortarlo para no ensanchar el documento. */
+        overflow: clip;
+    }
+
+    @media (min-width: 56rem) {
+        .biografia {
+            grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+            gap: var(--e-8);
+        }
+    }
+
+    .biografia__foto {
+        position: relative;
+        isolation: isolate;
+        margin: 0;
+        justify-self: center;
+        max-inline-size: 18rem;
+        inline-size: 100%;
+    }
+
+    .biografia__foto::before {
+        content: "";
+        position: absolute;
+        inset: 38% -12% -8% -12%;
+        z-index: -1;
+        background: radial-gradient(58% 72% at 50% 58%,
+                    color-mix(in oklab, var(--luz) 48%, transparent), transparent 74%);
+        filter: blur(24px);
+    }
+
+    .biografia__foto img {
+        border-radius: var(--radio-grande);
+        border: 1px solid var(--linea);
+        inline-size: 100%;
+    }
+
+    /* --- Ficha de datos (clave / valor) --- */
+
+    .ficha { display: grid; }
+
+    .ficha__fila {
+        display: grid;
+        gap: var(--e-1) var(--e-5);
+        padding-block: var(--e-4);
+        border-block-start: 1px solid var(--linea);
+    }
+
+    .ficha__fila:last-child { border-block-end: 1px solid var(--linea); }
+
+    @media (min-width: 40rem) {
+        .ficha__fila { grid-template-columns: minmax(0, 12rem) minmax(0, 1fr); }
+    }
+
+    .ficha dt { font-weight: 700; font-size: var(--t-sm); }
+
+    .ficha dd { margin: 0; color: var(--tinta-2); }
+
+    /* --- Cobertura por comunas --- */
+
+    .zonas {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--e-4);
+        margin-block-start: var(--e-5);
+    }
+
+    @media (min-width: 46rem) {
+        .zonas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .zona {
+        display: grid;
+        gap: var(--e-2);
+        padding: min(var(--e-5), 6.5vw);
+    }
+
+    .zona h3 { font-size: var(--t-lg); }
+
+    .zona p { color: var(--tinta-2); margin: 0; font-size: var(--t-sm); }
+
+    /* --- Página de error --- */
+
+    .error-pagina {
+        display: grid;
+        gap: var(--e-5);
+        justify-items: center;
+        text-align: center;
+        padding-block: var(--e-8);
+        max-inline-size: 34rem;
+        margin-inline: auto;
+    }
+
+    .error-pagina p { color: var(--tinta-2); }
+
+    .error-pagina .botonera { justify-content: center; }
+
+    /* --- Mapa de enlaces en el 404 --- */
+
+    .atajos {
+        display: grid;
+        gap: var(--e-2);
+        margin-block-start: var(--e-6);
+        inline-size: 100%;
+        text-align: start;
+    }
+
+    .atajos a {
+        display: block;
+        padding: var(--e-4);
+        border-block-start: 1px solid var(--linea);
+        color: var(--tinta);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .atajos a:last-child { border-block-end: 1px solid var(--linea); }
+
+    .atajos a:hover { color: var(--cyan); }
+
+    /* --- Bloque de consentimiento dentro de la política --- */
+
+    .consentimiento-estado {
+        display: grid;
+        gap: var(--e-3);
+        justify-items: start;
+        padding: var(--e-5);
+        margin-block-start: var(--e-5);
+    }
+
+    .consentimiento-estado p { margin: 0; color: var(--tinta-2); }
+}

@@ -1,0 +1,157 @@
+/* Páginas de servicio y de dolencia.
+   Lo común (prosa, faq, indice, superficie, panel, pasos, aviso, cierre) vive
+   en style.css; aquí solo la portada de estas páginas y sus extras. */
+
+@layer componentes {
+
+    /* --- Portada de página interior --- */
+
+    .portada {
+        padding-block: var(--e-5) var(--e-seccion);
+        /* El resplandor de la foto se sale 12% por cada lado a proposito. Sin
+           este recorte, en movil empuja el ancho del documento y aparece
+           scroll horizontal. `clip` y no `hidden`: hidden rompe el sticky. */
+        overflow: clip;
+    }
+
+    .portada__rejilla {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--e-6);
+        align-items: center;
+    }
+
+    @media (min-width: 56rem) {
+        .portada__rejilla {
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+            gap: var(--e-8);
+        }
+    }
+
+    .portada h1 {
+        font-size: var(--t-3xl);
+    }
+
+    /* La foto de la portada interior repite el gesto del hero: luz por detrás */
+    .portada__figura {
+        position: relative;
+        isolation: isolate;
+        margin: 0;
+        justify-self: center;
+        max-inline-size: 20rem;
+        inline-size: 100%;
+        min-inline-size: 0;
+    }
+
+    .portada__figura::before {
+        content: "";
+        position: absolute;
+        inset: 38% -12% -7% -12%;
+        z-index: -1;
+        background: radial-gradient(58% 72% at 50% 58%,
+                    color-mix(in oklab, var(--luz) 50%, transparent), transparent 74%);
+        filter: blur(24px);
+        pointer-events: none;
+    }
+
+    .portada__figura img {
+        border: 1px solid var(--linea);
+        inline-size: 100%;
+    }
+
+    /* --- Síntomas: lista de filas, no tarjetas --- */
+
+    .sintomas {
+        display: grid;
+        margin-block-start: var(--e-5);
+    }
+
+    /* El texto va en un solo <span> (gen_comun.sintomas): con un <strong>
+       suelto, la rejilla lo volvia una celda aparte (R-01). */
+    .sintomas li {
+        display: grid;
+        grid-template-columns: 1.4rem minmax(0, 1fr);
+        gap: var(--e-3);
+        align-items: start;
+        padding-block: var(--e-4);
+        border-block-start: 1px solid var(--linea);
+    }
+
+    .sintomas li:last-child { border-block-end: 1px solid var(--linea); }
+
+    .sintomas li::before {
+        content: "";
+        inline-size: 1.4rem;
+        block-size: 1.4rem;
+        margin-block-start: 0.2rem;
+        background: var(--luz);
+        -webkit-mask: var(--punto-svg) no-repeat center / contain;
+        mask: var(--punto-svg) no-repeat center / contain;
+    }
+
+    :root {
+        --punto-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4.5' fill='%23fff'/%3E%3C/svg%3E");
+    }
+
+    /* --- Bloque de pasos numerados dentro de la prosa --- */
+
+    .pasos--columna {
+        grid-template-columns: 1fr;
+        gap: var(--e-5);
+        margin-block-start: var(--e-5);
+    }
+
+    @media (min-width: 52rem) {
+        .pasos--columna { grid-template-columns: 1fr; }
+    }
+
+    .pasos--columna .paso {
+        /* minmax(0, 1fr): con 1fr a secas «confeccionarlas» al 200 % fijaba
+           el minimo de la columna y la pagina se salia 11 px en 360 (R-58). */
+        grid-template-columns: 2.5rem minmax(0, 1fr);
+        column-gap: var(--e-4);
+        align-items: start;
+    }
+
+    .pasos--columna .paso h3 { align-self: center; }
+
+    .pasos--columna .paso p { grid-column: 2; }
+
+    /* Con la fuente del sistema muy agrandada, la columna del numero se come
+       un tercio de la linea y «confeccionarlas» se partia en dos. Cuando la
+       lista mide menos de 14 de sus propios em (pasa al 150 % y al 200 % en un
+       movil, nunca al 100 %), el texto baja a todo el ancho. */
+    .pasos--columna { container-type: inline-size; }
+
+    @container (width < 14em) {
+        .pasos--columna .paso p { grid-column: 1 / -1; }
+    }
+
+    /* --- Otras dolencias al pie de una página de dolencia --- */
+
+    .relacionadas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--e-2);
+        margin-block-start: var(--e-5);
+    }
+
+    .relacionadas a {
+        display: inline-flex;
+        align-items: center;
+        min-block-size: 2.75rem;
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        border: 1px solid var(--linea-campo);
+        color: var(--tinta);
+        text-decoration: none;
+        font-size: var(--t-sm);
+        font-weight: 500;
+        transition: border-color 160ms ease, color 160ms ease;
+    }
+
+    .relacionadas a:hover {
+        border-color: var(--luz);
+        color: var(--cyan);
+    }
+}

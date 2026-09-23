@@ -1,0 +1,1557 @@
+/* =========================================================================
+   Plantillas Ortopedicas Crea - sistema visual
+   Concepto: LUZ DESDE ABAJO. Ver DESIGN.md.
+   =========================================================================
+
+   El podoscopio es una placa de vidrio iluminada sobre la que el paciente se
+   para: Monserrat mira el pie a contraluz, desde abajo. Ese es el principio de
+   toda la pagina.
+
+   - El fondo es una noche verdosa. Los neutros salen de bajarle la luz al cyan
+     del logo, para que pertenezcan a la misma familia y no sean un gris de
+     plantilla.
+   - El cyan NO se usa como relleno plano: se usa como LUZ. Filete encendido en
+     el borde superior de las superficies, resplandor bajo los bloques, halo al
+     recibir el foco.
+   - El naranja hace UNA sola cosa: es la accion. Si aparece donde no se puede
+     tocar, deja de significar "escribe ahora".
+
+   Oscuro por defecto: la escena real es un telefono de noche despues de un dia
+   con dolor. El tema claro se elige con el boton, nunca con
+   @media (prefers-color-scheme).
+
+   Contraste comprobado en tools/contraste.py, que lee estos mismos tokens
+   (38 pares, WCAG 2.2 AA). Si cambias un color, corre ese script antes de
+   subir nada.
+   ========================================================================= */
+
+@layer reset, base, componentes, utilidades;
+
+/* ---------- Fuentes (self-hosted; la CSP no permite CDN) ---------------- */
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../fonts/figtree-var.woff2') format('woff2');
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+                   U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF;
+}
+
+@font-face {
+    font-family: 'Young Serif';
+    src: url('../fonts/youngserif.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+                   U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF;
+}
+
+/* ---------- Tokens ------------------------------------------------------ */
+
+:root {
+    /* Los tres colores del logo. Es lo unico obligatorio de la marca. */
+    --luz: #12D2E7;
+    --accion: #F7941D;
+    --marca-verde: #00C853;
+    --sobre-accion: #2B1A05;
+    --sobre-luz: #08323A;
+
+    /* Tema oscuro: el de por defecto */
+    --fondo: #0A1013;
+    --fondo-2: #111A1E;
+    --fondo-3: #18262B;
+    --tinta: #EDF4F5;
+    --tinta-2: #9CB0B5;
+    --cyan: #5FE0EE;
+    --ok: #3FE07A;
+    --linea: #223237;
+    --linea-campo: #6E868C;
+    --error: #FFB4AB;
+    --sombra: 0 2px 6px rgb(0 0 0 / 40%), 0 20px 44px -22px rgb(0 0 0 / 70%);
+
+    /* Anillo de foco, accent-color de radios y checks y borde de la opcion
+       marcada. En oscuro es la luz del logo; en claro esa misma luz da 1,84:1
+       sobre blanco y no llega al 3:1 de WCAG 1.4.11, asi que pasa al cyan
+       oscuro. tools/contraste.py mide este token, no una copia. */
+    --foco: var(--luz);
+
+    color-scheme: dark;
+
+    /* Tipografia */
+    --fuente-texto: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --fuente-titulo: 'Young Serif', ui-serif, Georgia, 'Times New Roman', serif;
+
+    --t-xs: 0.8125rem;
+    --t-sm: 0.9375rem;
+    --t-base: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+    --t-lg: clamp(1.125rem, 1.07rem + 0.25vw, 1.25rem);
+    --t-xl: clamp(1.3125rem, 1.2rem + 0.5vw, 1.625rem);
+    --t-2xl: clamp(1.625rem, 1.4rem + 1vw, 2.25rem);
+    --t-3xl: clamp(2rem, 1.6rem + 1.8vw, 3rem);
+    --t-4xl: clamp(2.375rem, 1.75rem + 2.8vw, 4rem);
+
+    /* Espacio */
+    --e-1: 0.25rem;
+    --e-2: 0.5rem;
+    --e-3: 0.75rem;
+    --e-4: 1rem;
+    --e-5: 1.5rem;
+    --e-6: 2rem;
+    --e-7: 3rem;
+    --e-8: 4rem;
+    --e-seccion: clamp(3.5rem, 2.2rem + 5.5vw, 6.5rem);
+
+    --ancho: 72rem;
+    /* Medida de linea del texto corrido: 62-72 caracteres (DESIGN.md). En em
+       y no en rem, para que siga dando lo mismo en el texto chico (avisos,
+       FAQ) y con la fuente del sistema agrandada. Comprobada midiendo la
+       primera linea de cada parrafo con Range en Playwright. */
+    --medida: 30em;
+    --radio: 0.625rem;
+    --radio-grande: 1.25rem;
+
+    /* Alto del banner de consentimiento; lo fija consentimiento.js para que la
+       barra de accion del movil no quede tapada. */
+    --alto-consentimiento: 0px;
+    /* Alto de la barra de accion del movil; el body le cede ese espacio. */
+    --alto-barra: 4.75rem;
+}
+
+:root[data-theme="light"] {
+    --fondo: #FFFFFF;
+    --fondo-2: #F2FBFC;
+    --fondo-3: #E4F4F7;
+    --tinta: #0A1013;
+    --tinta-2: #4B5658;
+    --cyan: #09707C;
+    --ok: #0A7A3C;
+    --linea: #DCEAED;
+    --linea-campo: #5E8087;
+    --error: #B3261E;
+    --sombra: 0 2px 6px rgb(9 112 124 / 8%), 0 20px 44px -22px rgb(9 112 124 / 28%);
+    --foco: var(--cyan);
+
+    color-scheme: light;
+}
+
+/* ---------- Reset ------------------------------------------------------- */
+
+@layer reset {
+    /* `html` va SIN :where() a proposito. Con :where() su especificidad es 0 y
+       la regla universal de abajo (tambien 0, pero posterior) le ganaba: html
+       quedaba en content-box y cada input con inline-size:100% se salia de la
+       pantalla por el ancho de su propio padding. Con el selector desnudo
+       (0,0,1) manda html, que es el patron canonico. */
+    html {
+        box-sizing: border-box;
+    }
+
+    :where(html) {
+        -webkit-text-size-adjust: 100%;
+        scroll-behavior: smooth;
+        scroll-padding-block-start: 5.5rem;
+    }
+
+    /* La barra de accion fija (y el banner de consentimiento, si esta) tapaban
+       el elemento con foco al tabular: campos del formulario, enlaces del pie.
+       WCAG 2.4.11. Mismo corte que la barra: desde 52rem no existe. */
+    @media (width < 52rem) {
+        :where(html) {
+            scroll-padding-block-end: calc(var(--alto-barra) + var(--alto-consentimiento) + 1rem);
+        }
+    }
+
+    /* Movil horizontal o texto muy agrandado: la cabecera deja de ser fija
+       (ver .cabecera), asi que no hace falta reservarle espacio arriba. */
+    @media (max-height: 30rem) {
+        :where(html) { scroll-padding-block-start: 1rem; }
+    }
+
+    /* El valor es `inherit`, no un valor concreto: cualquier componente puede
+       cambiarlo en su subarbol sin pelear con la cascada. */
+    :where(*, *::before, *::after) { box-sizing: inherit; }
+
+    :where(body, h1, h2, h3, h4, p, figure, blockquote, dl, dd, ul, ol, fieldset) {
+        margin: 0;
+    }
+
+    :where(ul[class], ol[class]) { padding: 0; list-style: none; }
+
+    :where(img, picture, svg, video) { display: block; max-inline-size: 100%; }
+
+    /* Con el texto del sistema al 200 % una palabra larga (el @usuario de
+       Instagram, un correo) empujaba el ancho de la pagina. */
+    :where(body) { overflow-wrap: break-word; }
+
+    :where(img) { block-size: auto; }
+
+    :where(input, button, textarea, select) { font: inherit; color: inherit; }
+
+    :where(fieldset) { border: 0; padding: 0; min-inline-size: 0; }
+
+    :where(legend) { padding: 0; }
+
+    :where(button) { background: none; border: 0; cursor: pointer; }
+
+    :where(table) { border-collapse: collapse; }
+
+    @media (prefers-reduced-motion: reduce) {
+        :where(html) { scroll-behavior: auto; }
+    }
+}
+
+/* ---------- Base -------------------------------------------------------- */
+
+@layer base {
+    body {
+        margin: 0;
+        background: var(--fondo);
+        color: var(--tinta);
+        font-family: var(--fuente-texto);
+        font-size: var(--t-base);
+        line-height: 1.65;
+        font-synthesis-weight: none;
+        -webkit-font-smoothing: antialiased;
+        /* La barra de accion del movil es fija: el contenido le cede su alto
+           para que el ultimo parrafo no quede debajo. */
+        padding-block-end: calc(var(--alto-barra) + var(--alto-consentimiento));
+    }
+
+    @media (min-width: 52rem) {
+        body { padding-block-end: var(--alto-consentimiento); }
+    }
+
+    /* Ningun parrafo del contenido pasa de la medida de linea, este dentro de
+       .prosa o suelto en un panel, un formulario o una portada. Vive en la
+       capa base: cualquier componente que necesite otro tope le gana. */
+    main p { max-inline-size: var(--medida); }
+
+    h1, h2, h3 {
+        font-family: var(--fuente-titulo);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+        /* Con el texto al 200 % una palabra de titulo («Cuentame» a 72 px) no
+           cabe en 360 px: se divide con guion donde el idioma lo permite y, si
+           no, se corta antes que abrir scroll horizontal. El limite evita
+           que al 100 % se parta una palabra corta como «ortopédicas» solo
+           porque text-wrap: balance busca lineas parejas. */
+        hyphens: auto;
+        hyphenate-limit-chars: 12 6 6;
+        overflow-wrap: anywhere;
+    }
+
+    h1 {
+        font-size: var(--t-4xl);
+        letter-spacing: -0.03em;
+    }
+
+    h2 { font-size: var(--t-2xl); }
+    h3 { font-size: var(--t-xl); }
+
+    h4 {
+        font-family: var(--fuente-texto);
+        font-size: var(--t-lg);
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0;
+    }
+
+    p { text-wrap: pretty; }
+
+    a {
+        color: var(--cyan);
+        text-decoration-thickness: 0.07em;
+        text-underline-offset: 0.2em;
+    }
+
+    a:hover:not([class]) { text-decoration-thickness: 0.14em; }
+
+    strong { font-weight: 700; }
+
+    /* --- Superficies que dibuja el navegador, no yo. Se tinen igual. --- */
+
+    :focus-visible {
+        outline: 3px solid var(--foco);
+        outline-offset: 3px;
+        border-radius: 3px;
+    }
+
+    ::selection {
+        background: var(--luz);
+        color: var(--sobre-luz);
+    }
+
+    :where(input, textarea, select) {
+        caret-color: var(--foco);
+        accent-color: var(--foco);
+    }
+
+    :where(html) {
+        scrollbar-color: var(--linea-campo) var(--fondo);
+        scrollbar-width: thin;
+    }
+
+    figcaption {
+        color: var(--tinta-2);
+        font-size: var(--t-sm);
+        margin-block-start: var(--e-3);
+    }
+}
+
+/* ---------- Componentes ------------------------------------------------- */
+
+@layer componentes {
+
+    /* --- Contenedor y secciones --- */
+
+    .contenedor {
+        inline-size: min(100% - 2rem, var(--ancho));
+        margin-inline: auto;
+    }
+
+    @media (min-width: 40rem) {
+        .contenedor { inline-size: min(100% - 3rem, var(--ancho)); }
+    }
+
+    .seccion { padding-block: var(--e-seccion); }
+
+    .seccion--elevada { background: var(--fondo-2); }
+
+    /* La luz que entra por debajo del bloque. Reemplaza a la sombra generica
+       y al divisor de onda: es el podoscopio, no un adorno. */
+    .seccion--luz {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .seccion--luz::before {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        inset-block-end: 0;
+        block-size: min(22rem, 60%);
+        z-index: -1;
+        pointer-events: none;
+        background: radial-gradient(70% 100% at 50% 100%,
+                    color-mix(in oklab, var(--luz) 20%, transparent), transparent 72%);
+    }
+
+    :root[data-theme="light"] .seccion--luz::before {
+        background: radial-gradient(70% 100% at 50% 100%,
+                    color-mix(in oklab, var(--luz) 26%, transparent), transparent 72%);
+    }
+
+    /* Parrafo de entrada bajo un h1. Vive aqui y no en servicio.css porque lo
+       usan tambien los articulos del blog, que no cargan esa hoja. */
+    .portada__entrada {
+        font-size: var(--t-lg);
+        color: var(--tinta-2);
+        margin-block-start: var(--e-5);
+        max-inline-size: 34rem;
+    }
+
+    .seccion__intro {
+        max-inline-size: 34rem;
+        margin-block-end: var(--e-6);
+    }
+
+    .seccion__intro p {
+        color: var(--tinta-2);
+        font-size: var(--t-lg);
+        margin-block-start: var(--e-3);
+    }
+
+    /* --- El arco: la curva verde bajo el pie del logo --- */
+
+    :root {
+        --arco-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 16'%3E%3Cpath d='M3 13C20 3 68 3 85 13' fill='none' stroke='%23fff' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E");
+        --check-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20.3 5.7 9 17l-5.3-5.3 1.4-1.4L9 14.2l9.9-9.9z' fill='%23fff'/%3E%3C/svg%3E");
+        --mas-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 5h2v14h-2z' fill='%23fff'/%3E%3Cpath d='M5 11h14v2H5z' fill='%23fff'/%3E%3C/svg%3E");
+    }
+
+    .titulo-arco::after {
+        content: "";
+        display: block;
+        inline-size: 5.5rem;
+        block-size: 0.7rem;
+        margin-block-start: var(--e-4);
+        background: var(--luz);
+        -webkit-mask: var(--arco-svg) no-repeat left center / contain;
+        mask: var(--arco-svg) no-repeat left center / contain;
+    }
+
+    /* Ventana de arco para las fotos: la misma curva, ahora como forma */
+    .foto-arco {
+        border-radius: 13rem 13rem var(--radio) var(--radio);
+        overflow: hidden;
+    }
+
+    /* --- Superficie elevada con filete encendido arriba --- */
+
+    .superficie {
+        position: relative;
+        background: var(--fondo-2);
+        border: 1px solid var(--linea);
+        border-radius: var(--radio-grande);
+    }
+
+    .superficie::before {
+        content: "";
+        position: absolute;
+        inset-inline: 14%;
+        inset-block-start: -1px;
+        block-size: 1px;
+        background: linear-gradient(90deg, transparent, var(--luz), transparent);
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    /* --- Botones --- */
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--e-2);
+        min-block-size: 3rem;
+        /* Relleno lateral topado en vw: con la fuente al 200 % los 1,5rem de
+           cada lado dejaban 100 px para el texto y partian «funciona». */
+        padding: 0.75rem min(1.5rem, 6.5vw);
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: var(--t-base);
+        line-height: 1.2;
+        text-align: center;
+        text-decoration: none;
+        border: 2px solid transparent;
+        /* Nunca mas ancho que su contenedor: con texto grande el boton se parte
+           en dos lineas en vez de empujar el ancho de la pagina. break-word y
+           no anywhere: anywhere cortaba «Monserr / at» aunque la palabra
+           cupiera entera en la linea siguiente. */
+        max-inline-size: 100%;
+        overflow-wrap: break-word;
+        transition: background-color 180ms ease, border-color 180ms ease,
+                    color 180ms ease, translate 180ms ease;
+    }
+
+    .btn svg {
+        inline-size: 1.25em;
+        block-size: 1.25em;
+        flex: none;
+        fill: currentColor;
+    }
+
+    /* El naranja de marca con texto casi negro da 7,35:1. Ningun naranja que
+       siga pareciendo naranja llega a AA con texto blanco. */
+    .btn--accion {
+        background: var(--accion);
+        color: var(--sobre-accion);
+    }
+
+    /* Sin halo de color: la luz de esta pagina vive en los degradados
+       radiales bajo las fotos y el cierre, no en un box-shadow de adorno. */
+    .btn--accion:hover:not(:disabled) {
+        background: color-mix(in oklab, var(--accion) 90%, white);
+    }
+
+    .btn--linea {
+        background: transparent;
+        color: var(--tinta);
+        border-color: var(--linea-campo);
+    }
+
+    .btn--linea:hover:not(:disabled) {
+        border-color: var(--luz);
+        color: var(--cyan);
+    }
+
+    .btn:active:not(:disabled) { translate: 0 1px; }
+
+    .btn--ancho { inline-size: 100%; }
+
+    .botonera {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--e-3);
+        margin-block-start: var(--e-5);
+    }
+
+    /* --- Saltar al contenido --- */
+
+    .saltar {
+        position: absolute;
+        inset-inline-start: var(--e-4);
+        inset-block-start: -100%;
+        z-index: 100;
+        background: var(--fondo-3);
+        color: var(--cyan);
+        padding: var(--e-3) var(--e-4);
+        border-radius: var(--radio);
+        box-shadow: var(--sombra);
+    }
+
+    .saltar:focus { inset-block-start: var(--e-4); }
+
+    /* --- Cabecera --- */
+
+    .cabecera {
+        position: sticky;
+        inset-block-start: 0;
+        z-index: 40;
+        background: color-mix(in srgb, var(--fondo) 88%, transparent);
+        backdrop-filter: blur(14px);
+        border-block-end: 1px solid var(--linea);
+    }
+
+    /* Pantalla baja (movil horizontal, o texto del sistema al 200 %): una
+       cabecera fija mas la barra de accion se comian el 41 % del alto. Aqui la
+       cabecera se queda arriba y deja leer; la barra con el CTA se mantiene. */
+    @media (max-height: 30rem) {
+        .cabecera { position: relative; }
+    }
+
+    .cabecera__fila {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--e-3);
+        min-block-size: 4rem;
+    }
+
+    .cabecera__logo {
+        display: flex;
+        align-items: center;
+        min-block-size: 48px;
+        flex: none;
+        margin-inline-end: auto;
+    }
+
+    .cabecera__logo img {
+        inline-size: auto;
+        block-size: 2.6rem;
+    }
+
+    .cabecera__acciones {
+        display: flex;
+        align-items: center;
+        gap: var(--e-1);
+    }
+
+    .cabecera__cta { display: none; }
+
+    .icono-boton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-inline-size: 3rem;
+        min-block-size: 3rem;
+        border-radius: 999px;
+        color: var(--tinta-2);
+        transition: color 160ms ease, background-color 160ms ease;
+    }
+
+    .icono-boton:hover {
+        background: var(--fondo-3);
+        color: var(--tinta);
+    }
+
+    .icono-boton svg {
+        inline-size: 1.4rem;
+        block-size: 1.4rem;
+        fill: currentColor;
+    }
+
+    /* Menu: en movil se despliega bajo la cabecera */
+    .menu {
+        position: absolute;
+        inset-inline: 0;
+        inset-block-start: 100%;
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        padding: var(--e-3) 1rem var(--e-5);
+        background: var(--fondo-2);
+        border-block-end: 1px solid var(--linea);
+        box-shadow: var(--sombra);
+        /* En una pantalla baja los ultimos enlaces quedaban fuera y el body
+           esta bloqueado (.sin-scroll): el menu se desplaza por dentro. El 100 %
+           es el alto de la cabecera, que es su bloque contenedor. */
+        max-block-size: calc(100vh - 100%);
+        max-block-size: calc(100dvh - 100%);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .cabecera--menu-abierto .menu { display: flex; }
+
+    .menu a {
+        display: block;
+        padding: var(--e-3) var(--e-2);
+        color: var(--tinta);
+        text-decoration: none;
+        font-weight: 500;
+        border-block-end: 1px solid var(--linea);
+    }
+
+    .menu a:hover { color: var(--cyan); }
+
+    .menu a[aria-current="page"] {
+        color: var(--cyan);
+        font-weight: 700;
+    }
+
+    @media (min-width: 62rem) {
+        .menu {
+            position: static;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: var(--e-1);
+            padding: 0;
+            background: none;
+            border: 0;
+            box-shadow: none;
+            max-block-size: none;
+            overflow: visible;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            min-block-size: 48px;
+            padding: var(--e-2) var(--e-3);
+            font-size: var(--t-sm);
+            border: 0;
+            border-radius: var(--radio);
+        }
+
+        .menu a:hover { background: var(--fondo-3); }
+
+        #menu-boton { display: none; }
+        .cabecera__cta { display: inline-flex; }
+    }
+
+    /* --- Barra de accion fija (movil): el pulgar llega ahi --- */
+
+    /* Se aparta del banner de consentimiento con translate y no moviendo
+       inset-block-end: animar una propiedad de posicion generaba 10 layout
+       shifts en la primera visita; una transformacion no mueve el layout. */
+    .barra-accion {
+        position: fixed;
+        inset-inline: 0;
+        inset-block-end: 0;
+        translate: 0 calc(-1 * var(--alto-consentimiento));
+        z-index: 35;
+        display: flex;
+        gap: var(--e-2);
+        padding: var(--e-3) 1rem calc(var(--e-3) + env(safe-area-inset-bottom, 0px));
+        background: color-mix(in srgb, var(--fondo) 92%, transparent);
+        backdrop-filter: blur(14px);
+        border-block-start: 1px solid var(--linea);
+        transition: translate 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .barra-accion { transition: none; }
+    }
+
+    /* Rellenos laterales topados en vw: con el texto al 200 % los rem se
+       duplicaban y el boton de llamar quedaba fuera de la pantalla, donde una
+       barra fija no deja desplazarse para alcanzarlo. */
+    .barra-accion { padding-inline: min(1rem, 4vw); }
+
+    .barra-accion .btn { flex: 1; padding-inline: min(1.5rem, 4vw); }
+
+    .barra-accion .btn--linea { flex: 0 0 auto; padding-inline: min(1.1rem, 4vw); }
+
+    @media (min-width: 52rem) {
+        .barra-accion { display: none; }
+    }
+
+    /* --- Banner de consentimiento --- */
+
+    .consentimiento {
+        position: fixed;
+        inset-inline: 0;
+        inset-block-end: 0;
+        z-index: 50;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--e-4);
+        padding: var(--e-4) 1rem calc(var(--e-4) + env(safe-area-inset-bottom, 0px));
+        background: var(--fondo-2);
+        border-block-start: 1px solid var(--linea);
+        box-shadow: var(--sombra);
+    }
+
+    .consentimiento__texto {
+        flex: 1 1 20rem;
+        font-size: var(--t-sm);
+        line-height: 1.5;
+    }
+
+    .consentimiento__texto p { max-inline-size: 70ch; }
+
+    .consentimiento__texto p + p {
+        margin-block-start: var(--e-1);
+        color: var(--tinta-2);
+    }
+
+    .consentimiento__botones {
+        display: flex;
+        gap: var(--e-2);
+        flex-wrap: wrap;
+    }
+
+    .consentimiento .btn {
+        min-block-size: 3rem;
+        padding-inline: 1.2rem;
+        font-size: var(--t-sm);
+    }
+
+    /* Movil: el banner llego a tapar, junto con la barra de accion, el 43 %
+       de una pantalla de 360x740 (R-06). Mas compacto, con los dos botones
+       repartidos en una sola fila, y la barra de accion se retira mientras el
+       banner espera respuesta: dos franjas fijas apiladas eran demasiadas. El
+       CTA de la portada sigue a la vista y la barra vuelve al decidir. */
+    @media (width < 52rem) {
+        .consentimiento {
+            gap: var(--e-3);
+            padding: var(--e-3) min(1rem, 4vw) calc(var(--e-3) + env(safe-area-inset-bottom, 0px));
+        }
+
+        .consentimiento__botones { flex: 1 1 100%; }
+
+        .consentimiento .btn { flex: 1 1 0; padding-inline: min(1.2rem, 3vw); }
+
+        .con-consentimiento { --alto-barra: 0px; }
+
+        .con-consentimiento .barra-accion { display: none; }
+    }
+
+    /* --- Migas --- */
+
+    .migas {
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+        padding-block: var(--e-5) 0;
+    }
+
+    .migas ol {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--e-2);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .migas li:not(:last-child)::after {
+        content: "/";
+        margin-inline-start: var(--e-2);
+        color: var(--linea-campo);
+    }
+
+    /* --- Prosa --- */
+
+    .prosa { max-inline-size: var(--medida); }
+
+    .prosa > * + * { margin-block-start: var(--e-4); }
+
+    /* Lo que sigue a un bloque de prosa (aviso, botonera, indice, ficha) y la
+       prosa que sigue a un titulo necesitan aire propio. */
+    .prosa + *,
+    :is(h1, h2) + .prosa { margin-block-start: var(--e-5); }
+
+    .prosa h2 { margin-block-start: var(--e-7); }
+
+    .prosa h3 { margin-block-start: var(--e-6); }
+
+    .prosa :is(ul, ol):not([class]) { padding-inline-start: var(--e-5); }
+
+    .prosa li + li { margin-block-start: var(--e-2); }
+
+    /* --- Indice de filas: reemplaza al muro de tarjetas iguales --- */
+
+    .indice { display: grid; }
+
+    .indice li { border-block-start: 1px solid var(--linea); }
+
+    .indice li:last-child { border-block-end: 1px solid var(--linea); }
+
+    .indice a {
+        position: relative;
+        display: grid;
+        gap: var(--e-1) var(--e-6);
+        padding-block: var(--e-5);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    @media (min-width: 44rem) {
+        .indice a {
+            grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+            align-items: baseline;
+        }
+    }
+
+    .indice__nombre {
+        font-family: var(--fuente-titulo);
+        font-size: var(--t-xl);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        transition: color 180ms ease;
+    }
+
+    .indice__que {
+        color: var(--tinta-2);
+        max-inline-size: 46ch;
+    }
+
+    .indice a:hover .indice__nombre,
+    .indice a:focus-visible .indice__nombre { color: var(--cyan); }
+
+    /* La luz se enciende bajo la fila, de izquierda a derecha */
+    .indice a::after {
+        content: "";
+        position: absolute;
+        inset-inline: 0;
+        inset-block-end: -1px;
+        block-size: 1px;
+        background: var(--luz);
+        scale: 0 1;
+        transform-origin: left center;
+        transition: scale 320ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .indice a:hover::after,
+    .indice a:focus-visible::after { scale: 1 1; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .indice a::after { transition: none; }
+    }
+
+    /* --- Rasgos: lista de definicion, no cajas ni barras de color --- */
+
+    .rasgos { display: grid; }
+
+    .rasgo {
+        display: grid;
+        gap: var(--e-2) var(--e-6);
+        padding-block: var(--e-5);
+        border-block-start: 1px solid var(--linea);
+    }
+
+    .rasgo:last-child { border-block-end: 1px solid var(--linea); }
+
+    @media (min-width: 44rem) {
+        .rasgo { grid-template-columns: minmax(0, 16rem) minmax(0, 1fr); }
+    }
+
+    .rasgo dt {
+        font-family: var(--fuente-titulo);
+        font-size: var(--t-xl);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        color: var(--cyan);
+    }
+
+    .rasgo dd {
+        margin: 0;
+        color: var(--tinta-2);
+        max-inline-size: 52ch;
+    }
+
+    /* --- Las dos modalidades (portada, plantillas a medida, evaluacion) --- */
+
+    /* Vivian en home.css y en las paginas de servicio las tarjetas salian sin
+       relleno ni separacion. minmax(0, 1fr): con la fuente al 200 % una
+       columna automatica se ensanchaba 50 px mas alla de la pantalla. */
+    .modalidades {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--e-4);
+    }
+
+    @media (min-width: 52rem) {
+        .modalidades { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--e-5); }
+    }
+
+    .modalidad {
+        display: grid;
+        gap: var(--e-4);
+        align-content: start;
+        padding: var(--e-6) min(var(--e-5), 6.5vw);
+    }
+
+    /* Las dos no pesan igual: la evaluacion a domicilio es el servicio propio;
+       la de receta es la puerta para el resto de Chile. La diferencia la marca
+       la luz, no un borde de color. */
+    .modalidad--principal::before { opacity: 1; }
+
+    .modalidad h3 { font-size: var(--t-xl); }
+
+    .modalidad > p { color: var(--tinta-2); margin: 0; max-inline-size: var(--medida); }
+
+    .modalidad .botonera { margin-block-start: var(--e-2); }
+
+    /* --- Comunas de cobertura como fichas --- */
+
+    .comunas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--e-2);
+        margin-block-start: var(--e-5);
+        padding: 0;
+        list-style: none;
+    }
+
+    .comunas li {
+        padding: 0.45rem 1rem;
+        border-radius: 999px;
+        border: 1px solid var(--linea-campo);
+        font-size: var(--t-sm);
+        font-weight: 500;
+        color: var(--tinta);
+    }
+
+    /* --- Lista de comprobacion --- */
+
+    .lista-check { display: grid; gap: var(--e-3); }
+
+    /* Icono y texto: el texto es UNA celda (gen_comun.lista_check lo envuelve
+       en un <span>) y puede encogerse, si no una palabra larga ensancha la
+       columna. */
+    .lista-check li {
+        display: grid;
+        grid-template-columns: 1.4rem minmax(0, 1fr);
+        gap: var(--e-3);
+        align-items: start;
+        max-inline-size: calc(var(--medida) + 1.4rem + var(--e-3));
+    }
+
+    .lista-check li::before {
+        content: "";
+        inline-size: 1.4rem;
+        block-size: 1.4rem;
+        margin-block-start: 0.15rem;
+        background: var(--ok);
+        -webkit-mask: var(--check-svg) no-repeat center / contain;
+        mask: var(--check-svg) no-repeat center / contain;
+    }
+
+    /* --- Pasos numerados: aqui SI hay secuencia --- */
+
+    .pasos {
+        counter-reset: paso;
+        display: grid;
+        gap: var(--e-6);
+    }
+
+    @media (min-width: 52rem) {
+        .pasos { grid-template-columns: repeat(3, 1fr); gap: var(--e-5); }
+    }
+
+    .paso {
+        counter-increment: paso;
+        display: grid;
+        gap: var(--e-3);
+        align-content: start;
+    }
+
+    .paso::before {
+        content: counter(paso);
+        display: grid;
+        place-items: center;
+        inline-size: 2.5rem;
+        block-size: 2.5rem;
+        border-radius: 999px;
+        border: 1px solid var(--luz);
+        color: var(--cyan);
+        font-family: var(--fuente-titulo);
+        font-size: var(--t-lg);
+        font-weight: 400;
+    }
+
+    .paso p { color: var(--tinta-2); margin: 0; max-inline-size: var(--medida); }
+
+    /* --- Comparativa --- */
+
+    .comparativa {
+        inline-size: 100%;
+        /* En movil no se comprime hasta ser ilegible: se desliza. */
+        min-inline-size: 34rem;
+        font-size: var(--t-sm);
+    }
+
+    .comparativa :is(th, td) {
+        text-align: start;
+        padding: var(--e-4);
+        border-block-end: 1px solid var(--linea);
+        vertical-align: top;
+    }
+
+    .comparativa thead th {
+        font-family: var(--fuente-texto);
+        font-weight: 700;
+        text-wrap: balance;
+        color: var(--tinta);
+    }
+
+    .comparativa tbody th { font-weight: 500; color: var(--tinta-2); }
+
+    .comparativa td { color: var(--tinta-2); }
+
+    .comparativa__destacada {
+        background: var(--fondo-3);
+        color: var(--tinta);
+    }
+
+    .comparativa thead .comparativa__destacada { color: var(--cyan); }
+
+    /* Se desliza con el teclado: lleva tabindex="0", role="region" y nombre
+       (aria-labelledby al caption). El foco se dibuja por dentro para que el
+       anillo no quede cortado por el borde de la pantalla. */
+    .tabla-envoltorio {
+        overflow-x: auto;
+        /* Pista de que hay mas tabla a la derecha */
+        scrollbar-color: var(--linea-campo) transparent;
+    }
+
+    .tabla-envoltorio:focus-visible { outline-offset: -3px; }
+
+    .tabla-envoltorio + .tabla-pista {
+        margin-block-start: var(--e-3);
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+    }
+
+    @media (min-width: 46rem) {
+        .tabla-envoltorio + .tabla-pista { display: none; }
+    }
+
+    /* --- Testimonios --- */
+
+    .testimonios { display: grid; gap: var(--e-4); }
+
+    @media (min-width: 46rem) {
+        .testimonios { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .testimonio {
+        display: flex;
+        flex-direction: column;
+        gap: var(--e-4);
+        padding: var(--e-5);
+    }
+
+    .testimonio blockquote {
+        margin: 0;
+        font-family: var(--fuente-titulo);
+        font-size: var(--t-lg);
+        line-height: 1.45;
+        letter-spacing: -0.01em;
+    }
+
+    .testimonio figcaption {
+        margin: 0;
+        margin-block-start: auto;
+        font-weight: 700;
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+    }
+
+    /* --- Preguntas frecuentes --- */
+
+    .faq { display: grid; }
+
+    .faq details { border-block-start: 1px solid var(--linea); }
+
+    .faq details:last-of-type { border-block-end: 1px solid var(--linea); }
+
+    .faq summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--e-4);
+        padding-block: var(--e-4);
+        font-weight: 700;
+        cursor: pointer;
+        list-style: none;
+        min-block-size: 3rem;
+    }
+
+    .faq summary::-webkit-details-marker { display: none; }
+
+    .faq summary:hover { color: var(--cyan); }
+
+    .faq summary::after {
+        content: "";
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+        flex: none;
+        /* Indica si la respuesta esta abierta: es interfaz, no adorno, asi que
+           usa el token que cumple 3:1 en los dos temas. */
+        background: var(--foco);
+        -webkit-mask: var(--mas-svg) no-repeat center / contain;
+        mask: var(--mas-svg) no-repeat center / contain;
+        transition: rotate 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .faq details[open] summary::after { rotate: 45deg; }
+
+    .faq details > :not(summary) {
+        padding-block-end: var(--e-5);
+        color: var(--tinta-2);
+        max-inline-size: var(--medida);
+    }
+
+    .faq details > p + p { padding-block-start: var(--e-3); }
+
+    @media (prefers-reduced-motion: reduce) {
+        .faq summary::after { transition: none; }
+    }
+
+    /* --- Aviso clinico: superficie tenida con icono, sin barra de color --- */
+
+    .aviso {
+        display: grid;
+        grid-template-columns: 1.5rem minmax(0, 1fr);
+        gap: var(--e-3);
+        padding: var(--e-4);
+        background: var(--fondo-3);
+        border-radius: var(--radio);
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+        /* Tope del bloque entero y no solo del parrafo: una superficie tenida
+           de 1100 px con dos lineas dentro se lee como una franja vacia. */
+        max-inline-size: calc(var(--medida) + 1.5rem + var(--e-3) + 2 * var(--e-4));
+    }
+
+    .aviso svg {
+        inline-size: 1.5rem;
+        block-size: 1.5rem;
+        fill: var(--cyan);
+    }
+
+    /* --- Formulario --- */
+
+    .formulario { display: grid; gap: var(--e-4); min-inline-size: 0; }
+
+    .campo { display: grid; gap: var(--e-2); min-inline-size: 0; }
+
+    .campo > :is(label, legend) {
+        font-weight: 700;
+        font-size: var(--t-sm);
+    }
+
+    .campo__ayuda {
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+        margin: 0;
+    }
+
+    .campo :is(input[type="text"], input[type="tel"], input[type="email"], select, textarea) {
+        inline-size: 100%;
+        min-block-size: 3rem;
+        padding: 0.75rem 0.9rem;
+        background: var(--fondo);
+        color: var(--tinta);
+        border: 1px solid var(--linea-campo);
+        border-radius: var(--radio);
+        font-size: var(--t-base);
+        max-inline-size: 100%;
+        transition: border-color 160ms ease;
+    }
+
+    .campo :is(input, select, textarea):hover:not([aria-invalid="true"]) {
+        border-color: var(--tinta-2);
+    }
+
+    .campo textarea { resize: vertical; line-height: 1.5; }
+
+    .campo :is(input, select, textarea)[aria-invalid="true"] {
+        border-color: var(--error);
+        border-width: 2px;
+    }
+
+    .campo__error {
+        margin: 0;
+        font-size: var(--t-sm);
+        font-weight: 500;
+        color: var(--error);
+    }
+
+    /* La opcion entera reacciona al radio marcado, sin JS */
+    .opciones { display: grid; gap: var(--e-3); }
+
+    .opcion {
+        display: grid;
+        grid-template-columns: 1.4rem minmax(0, 1fr);
+        gap: var(--e-3);
+        align-items: start;
+        padding: var(--e-4);
+        border: 1px solid var(--linea-campo);
+        border-radius: var(--radio);
+        cursor: pointer;
+        transition: border-color 160ms ease, background-color 160ms ease;
+    }
+
+    .opcion:hover { border-color: var(--tinta-2); }
+
+    .opcion:has(:checked) {
+        border-color: var(--foco);
+        background: var(--fondo-3);
+    }
+
+    .opcion input {
+        inline-size: 1.4rem;
+        block-size: 1.4rem;
+        margin: 0;
+        margin-block-start: 0.15rem;
+    }
+
+    .opcion__titulo { display: block; font-weight: 700; }
+
+    .opcion__detalle {
+        display: block;
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+    }
+
+    .campo--check {
+        display: grid;
+        grid-template-columns: 1.4rem minmax(0, 1fr);
+        gap: var(--e-3);
+        align-items: start;
+    }
+
+    .campo--check input {
+        inline-size: 1.4rem;
+        block-size: 1.4rem;
+        margin: 0;
+        margin-block-start: 0.2rem;
+    }
+
+    .campo--check label { font-weight: 500; font-size: var(--t-sm); }
+
+    .formulario__salida {
+        display: grid;
+        gap: var(--e-3);
+        justify-items: start;
+        padding: var(--e-4);
+        background: var(--fondo-3);
+        border-radius: var(--radio);
+    }
+
+    .formulario__aviso {
+        font-size: var(--t-xs);
+        color: var(--tinta-2);
+        margin: 0;
+    }
+
+    /* --- Bloque a dos columnas: introduccion fija a un lado --- */
+
+    .dos-columnas {
+        display: grid;
+        gap: var(--e-6);
+        align-items: start;
+    }
+
+    /* Un hijo de grid trae min-width:auto. Sin esto, el <select> con opciones
+       largas ensanchaba la columna y el formulario se salia de la pantalla a
+       390px. */
+    .dos-columnas > * { min-inline-size: 0; }
+
+    @media (min-width: 62rem) {
+        .dos-columnas {
+            grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
+            gap: var(--e-8);
+        }
+
+        .dos-columnas__lado {
+            position: sticky;
+            inset-block-start: 6rem;
+        }
+    }
+
+    .dos-columnas .seccion__intro { margin-block-end: var(--e-4); }
+
+    /* --- Panel de apoyo --- */
+
+    .panel {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--e-4);
+        align-content: start;
+        padding: min(var(--e-5), 6.5vw);
+    }
+
+    .panel h3 { font-size: var(--t-lg); }
+
+    .panel p { color: var(--tinta-2); margin: 0; font-size: var(--t-sm); }
+
+    /* Correos y @usuario no tienen donde cortarse: se parten donde haga falta
+       antes que abrir scroll horizontal con el texto agrandado. */
+    .panel a:not(.btn) { overflow-wrap: anywhere; }
+
+    .panel ul {
+        display: grid;
+        gap: var(--e-3);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-size: var(--t-sm);
+    }
+
+    .panel li {
+        display: grid;
+        grid-template-columns: 1.25rem minmax(0, 1fr);
+        gap: var(--e-3);
+        align-items: start;
+    }
+
+    .panel li svg {
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+        margin-block-start: 0.15rem;
+        fill: var(--cyan);
+    }
+
+    /* --- Cierre --- */
+
+    .cierre {
+        display: grid;
+        gap: var(--e-5);
+        align-items: center;
+        justify-items: center;
+        /* Sin relleno lateral: el cierre no tiene fondo propio, y con texto
+           grande esos 3rem eran justo lo que faltaba para el boton. */
+        padding-block: var(--e-7);
+        text-align: center;
+    }
+
+    .cierre h2 { max-inline-size: 16ch; }
+
+    .cierre .titulo-arco::after { margin-inline: auto; }
+
+    .cierre p {
+        color: var(--tinta-2);
+        max-inline-size: 44ch;
+        margin-block-start: var(--e-4);
+    }
+
+    .cierre .botonera { margin-block-start: 0; justify-content: center; }
+
+    /* --- Pie --- */
+
+    .pie {
+        background: var(--fondo-2);
+        border-block-start: 1px solid var(--linea);
+        padding-block: var(--e-8) var(--e-5);
+    }
+
+    /* minmax(0, 1fr) y no la columna implicita: con el texto al 200 % el
+       correo del pie fijaba el ancho minimo de la rejilla y abria scroll
+       horizontal. */
+    .pie__rejilla {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--e-6);
+    }
+
+    @media (min-width: 44rem) {
+        .pie__rejilla { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 64rem) {
+        .pie__rejilla { grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: var(--e-7); }
+    }
+
+    .pie h2 {
+        font-size: var(--t-sm);
+        font-family: var(--fuente-texto);
+        font-weight: 700;
+        letter-spacing: 0;
+        color: var(--tinta-2);
+    }
+
+    /* Sin separacion entre filas: el aire lo pone el padding del enlace, que
+       asi mide 44 px de alto en vez de 19 (WCAG 2.5.8). */
+    .pie ul {
+        display: grid;
+        margin-block-start: var(--e-2);
+        padding: 0;
+        list-style: none;
+    }
+
+    .pie li a {
+        display: inline-block;
+        min-block-size: 48px;
+        padding-block: 0.65rem;
+    }
+
+    .pie a {
+        color: var(--tinta);
+        text-decoration: none;
+        overflow-wrap: anywhere;
+    }
+
+    .pie a:hover { color: var(--cyan); text-decoration: underline; }
+
+    .pie__marca img { inline-size: auto; block-size: 3.2rem; }
+
+    .pie__marca p {
+        margin-block-start: var(--e-4);
+        color: var(--tinta-2);
+        font-size: var(--t-sm);
+        max-inline-size: 34ch;
+    }
+
+    .pie__legal {
+        margin-block-start: var(--e-7);
+        padding-block-start: var(--e-4);
+        border-block-start: 1px solid var(--linea);
+        display: grid;
+        gap: var(--e-2);
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+    }
+
+    @media (min-width: 44rem) {
+        .pie__legal {
+            grid-auto-flow: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+
+    .redes {
+        display: flex;
+        gap: var(--e-2);
+        margin-block-start: var(--e-5);
+    }
+
+    .redes a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-inline-size: 3rem;
+        min-block-size: 3rem;
+        border-radius: 999px;
+        border: 1px solid var(--linea);
+        color: var(--tinta);
+    }
+
+    .redes svg { inline-size: 1.4rem; block-size: 1.4rem; fill: currentColor; }
+
+    .redes a:hover { border-color: var(--luz); color: var(--cyan); }
+}
+
+/* ---------- Utilidades -------------------------------------------------- */
+
+@layer utilidades {
+    /* [hidden] debe ganarle al display de los componentes. La capa utilidades
+       va la ultima, asi que manda sin necesidad de !important. */
+    [hidden] { display: none; }
+
+    /* Sprite de iconos: no puede ser display:none o <use> deja de resolver */
+    .sprite {
+        position: absolute;
+        inline-size: 0;
+        block-size: 0;
+        overflow: hidden;
+    }
+
+    /* Dato que la duena todavia no confirma. Se ve a proposito: asi no se
+       puede publicar el sitio con un valor inventado. Todos estan en
+       PENDIENTES-DUENA.md y deben desaparecer antes del cambio de DNS. */
+    .confirmar {
+        background: color-mix(in oklab, var(--accion) 28%, transparent);
+        color: var(--tinta);
+        padding: 0.1em 0.45em;
+        border-radius: 0.3em;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    /* El icono de tema muestra solo el del modo al que se va a cambiar */
+    :root:not([data-theme="light"]) .icono-luna { display: none; }
+    :root[data-theme="light"] .icono-sol { display: none; }
+
+    .solo-lectores {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .sin-scroll { overflow: hidden; }
+
+    /* Utilidades de separacion. Existen para que el HTML no necesite
+       style="..." en linea: asi la CSP puede ser style-src 'self' sin
+       'unsafe-inline'. */
+    .separado { margin-block-start: var(--e-5); }
+    .separado-mucho { margin-block-start: var(--e-7); }
+    .sin-margen { margin: 0; }
+    .sin-margen-arriba { margin-block-start: 0; }
+
+    /* El unico momento animado de la pagina: los tres pasos de "Como
+       funciona", porque el contenido ES una secuencia. El estado inicial
+       oculto lo pone el JS, asi que sin JS se lee todo. */
+    .anima-lista [data-anima] {
+        opacity: 0;
+        translate: 0 1.25rem;
+    }
+
+    .anima-lista [data-anima].visible {
+        opacity: 1;
+        translate: none;
+        transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+                    translate 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .anima-lista [data-anima] {
+            opacity: 1;
+            translate: none;
+        }
+    }
+}
+
+/* ---------- Colores forzados (alto contraste de Windows) ---------------- */
+
+@media (forced-colors: active) {
+    .btn,
+    .superficie,
+    .opcion,
+    .redes a { border: 1px solid ButtonText; }
+
+    .titulo-arco::after,
+    .lista-check li::before,
+    .faq summary::after { background: CanvasText; }
+
+    .seccion--luz::before,
+    .superficie::before,
+    .indice a::after { display: none; }
+
+    /* El rojo del error desaparece en colores forzados: queda una marca que
+       no depende del color, ademas del prefijo «Error:» que pone el JS. */
+    .campo__error {
+        text-decoration: underline wavy CanvasText;
+        text-underline-offset: 0.2em;
+    }
+
+    [aria-invalid="true"] { outline: 2px solid CanvasText; }
+}

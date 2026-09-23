@@ -1,0 +1,56 @@
+{
+  "id": "/",
+  "name": "Plantillas Ortopédicas Crea",
+  "short_name": "Crea Plantillas",
+  "description": "Plantillas ortopédicas a medida confeccionadas por una terapeuta ocupacional, con evaluación de pisada a domicilio en San Bernardo, La Florida, Talagante y Padre Hurtado. Con receta, envíos a todo Chile.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0A1013",
+  "theme_color": "#0A1013",
+  "orientation": "portrait-primary",
+  "lang": "es-CL",
+  "dir": "ltr",
+  "categories": ["health", "medical", "lifestyle"],
+  "icons": [
+    {
+      "src": "/img/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/img/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Escribir por WhatsApp",
+      "short_name": "WhatsApp",
+      "description": "Habla directamente con Monserrat",
+      "url": "/contacto.html"
+    },
+    {
+      "name": "Evaluación a domicilio",
+      "short_name": "A domicilio",
+      "description": "Cómo es la visita y qué comunas cubre",
+      "url": "/evaluacion-a-domicilio.html"
+    }
+  ],
+  "prefer_related_applications": false
+}

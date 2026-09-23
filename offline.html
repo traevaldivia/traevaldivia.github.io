@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es-CL" data-theme="dark">
+<head>
+<meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sin conexión | Plantillas Crea</title>
+<meta name="description" content="Estás sin conexión">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0A1013">
+<!-- La sirve el service worker cuando no hay señal y la página pedida no está
+     guardada. Puede aparecer en cualquier URL, así que todas las rutas son
+     absolutas, y todo lo que carga está en el precache de sw.js. -->
+<link rel="icon" href="/favicon-32x32.png" sizes="32x32">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/paginas/contenido.css">
+<!-- Sin defer a propósito: fija data-theme antes del primer pintado. -->
+<script src="/js/theme-toggle.js"></script>
+</head>
+<body>
+
+<main id="contenido">
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="error-pagina">
+        <img src="/img/logo-crea.webp" width="160" height="105" alt="Plantillas Ortopédicas Crea">
+        <h1>Estás sin conexión</h1>
+        <div class="prosa">
+          <p>Esta página no quedó guardada en tu teléfono y ahora mismo no hay señal para traerla.
+            Cuando vuelvas a tener conexión, recarga y aparece.</p>
+          <p>Si quieres escribirme igual, WhatsApp guarda tu mensaje y lo envía apenas vuelva la
+            señal.</p>
+        </div>
+        <div class="botonera">
+          <a class="btn btn--accion" href="https://wa.me/56967273372?text=Hola%20Monserrat%2C%20vengo%20del%20sitio%20web%20y%20quiero%20informaci%C3%B3n%20sobre%20plantillas%20ortop%C3%A9dicas%20a%20medida."
+             rel="noopener" target="_blank">Escribir a Monserrat<span class="solo-lectores"> (abre WhatsApp)</span></a>
+          <a class="btn btn--linea" href="/">Ir a la portada</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

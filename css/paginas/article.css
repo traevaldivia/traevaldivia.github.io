@@ -1,0 +1,114 @@
+/* Artículo del blog. El sistema común vive en style.css. */
+
+@layer componentes {
+
+    .articulo {
+        padding-block: var(--e-5) var(--e-seccion);
+    }
+
+    .articulo__cabecera {
+        max-inline-size: 42rem;
+    }
+
+    .articulo__cabecera h1 { font-size: var(--t-3xl); }
+
+    /* Autoría y fecha: es la señal de que esto lo escribe una profesional con
+       nombre, no un generador de contenido. */
+    .autoria {
+        display: flex;
+        align-items: center;
+        gap: var(--e-3);
+        margin-block-start: var(--e-5);
+        font-size: var(--t-sm);
+        color: var(--tinta-2);
+    }
+
+    .autoria img {
+        inline-size: 2.75rem;
+        block-size: 2.75rem;
+        border-radius: 999px;
+        object-fit: cover;
+        object-position: 50% 20%;
+        border: 1px solid var(--linea);
+        flex: none;
+    }
+
+    .autoria strong { color: var(--tinta); }
+
+    .articulo__figura {
+        position: relative;
+        isolation: isolate;
+        margin: var(--e-6) 0 0;
+        max-inline-size: 34rem;
+    }
+
+    .articulo__figura::before {
+        content: "";
+        position: absolute;
+        inset: 42% -8% -6% -8%;
+        z-index: -1;
+        background: radial-gradient(58% 72% at 50% 58%,
+                    color-mix(in oklab, var(--luz) 42%, transparent), transparent 74%);
+        filter: blur(24px);
+        pointer-events: none;
+    }
+
+    .articulo__figura img {
+        border-radius: var(--radio-grande);
+        border: 1px solid var(--linea);
+        inline-size: 100%;
+    }
+
+    /* El resplandor se sale a propósito; sin recorte ensancha el documento. */
+    .articulo { overflow: clip; }
+
+    /* Índice de contenidos: no es decoración, es la forma de que alguien con
+       dolor encuentre su párrafo sin leerlo todo. */
+    .indice-articulo {
+        max-inline-size: var(--medida);
+        margin-block-start: var(--e-6);
+        padding: var(--e-5);
+    }
+
+    .indice-articulo h2 {
+        font-size: var(--t-lg);
+        font-family: var(--fuente-texto);
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+
+    .indice-articulo ol {
+        display: grid;
+        gap: var(--e-2);
+        margin-block-start: var(--e-4);
+        padding-inline-start: var(--e-5);
+        color: var(--tinta-2);
+    }
+
+    .indice-articulo a { color: var(--cyan); }
+
+    /* Llamada a la acción intercalada en el texto */
+    .cta-inline {
+        display: grid;
+        gap: var(--e-4);
+        justify-items: start;
+        padding: var(--e-5);
+        margin-block: var(--e-7);
+        max-inline-size: 42rem;
+    }
+
+    .cta-inline p {
+        margin: 0;
+        color: var(--tinta-2);
+    }
+
+    .cta-inline h2 {
+        font-size: var(--t-lg);
+    }
+
+    .articulo .prosa h2 {
+        /* Más aire encima que debajo: el encabezado pertenece a lo que sigue. */
+        margin-block-start: var(--e-8);
+        scroll-margin-block-start: 6rem;
+    }
+}
